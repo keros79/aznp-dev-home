@@ -1,8 +1,8 @@
 # AZNP 결제 및 인증 연동 가이드
 
-**버전**: 2.0  
-**작성일**: 2026년 8월 9일  
-**핵심 지원**: Solana Wallet-based Stateless Micro-payment (API Key / 회원가입 필요 없음) + Lemon Squeezy (사람용 구독)
+**버전**: 2.1  
+**작성일**: 2026년 9월 11일  
+**핵심 지원**: Base (EVM) Wallet-based Stateless Micro-payment (API Key / 회원가입 필요 없음) + Lemon Squeezy (사람용 구독)
 
 ---
 
@@ -12,12 +12,12 @@ AZNP는 AI 에이전트와 사용자를 위해 두 가지 지불 및 인증 경�
 
 | 경로 | 대상 | 인증 방식 | 요금 체계 |
 |------|------|----------|-----------|
-| **A. Solana Wallet Auth (권장)** | AI 에이전트 / 개발자 | Solana Ed25519 서명 (`x-wallet-address`) | $20 USDC 이상 충전 크레딧 차감 |
+| **A. Base (EVM) Wallet Auth (권장)** | AI 에이전트 / 개발자 | Base EVM EIP-191 / EIP-712 서명 (`x-wallet-address`) | $20 Base USDC 이상 충전 크레딧 차감 |
 | **B. Lemon Squeezy** | 사람 사용자 | API Key (`X-API-Key`) | 월 구독 ($19/mo) |
 
 ---
 
-## 2. 요금 체계 (Solana USDC)
+## 2. 요금 체계 (Base USDC)
 
 AI 에이전트 및 무키(Stateless) 이용자를 위한 충전 단위 및 단가 구조입니다.
 
@@ -27,18 +27,18 @@ AI 에이전트 및 무키(Stateless) 이용자를 위한 충전 단위 및 단�
 | **Enterprise** | **$100 USDC** | **80,000회** | **$0.00125** (약 1.6원) | **0.7%** (수수료 극소화) | 약 $5,600 (약 730만원 상당) |
 
 - **최소 충전 요건**: **$20 USDC** ($20 미만 입금 시 충전 거부)
-- **수신 서비스 지갑 주소 (Solana)**: `GuUdPHj3dnafbFvF2gMscCVAMCd4NvSE5ktsrbdAvT4E`
-- **USDC Mint Address**: `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
+- **수신 서비스 지갑 주소 (Base)**: `0x<BASE_RECEIVER_WALLET>` (실제 주소로 교체)
+- **USDC (ERC-20) 컨트랙트 (Base)**: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`
 
 ---
 
-## 3. Solana Wallet-based Stateless Micro-payment 연동
+## 3. Base (EVM) Wallet-based Stateless Micro-payment 연동
 
-별도의 회원가입이나 API Key 보관 없이, **솔라나 지갑 주소(PublicKey)** 자체를 계정 ID로 사용합니다.
+별도의 회원가입이나 API Key 보관 없이, **Base(EVM) 지갑 주소(0x + 40 hex)** 자체를 계정 ID로 사용합니다.
 
 ```
 ┌──────────────┐                 ┌───────────────────────┐                 ┌────────────────────────┐
-│  AI Agent    │ ──(1. Deposit)─>│ Solana Blockchain     │                 │ Cloudflare Workers API │
+│  AI Agent    │ ──(1. Deposit)─>│ Base Blockchain (EVM) │                 │ Cloudflare Workers API │
 │ (Wallet/Key) │                 │ (USDC Transfer)       │                 │ + Cloudflare KV        │
 └──────────────┘                 └───────────────────────┘                 └────────────────────────┘
        │                                     │                                         │
@@ -49,10 +49,11 @@ AI 에이전트 및 무키(Stateless) 이용자를 위한 충전 단위 및 단�
        │                                                                               │
        │─── (4. GET /?url=...) ────────────────────────────────────────────────────────>│
        │    Headers:                                                                   │
-       │      x-wallet-address: <SOL_WALLET>                                           │
-       │      x-signature: <Ed25519_SIG>                                               │
+       │      x-wallet-address: <0x_BASE_ADDRESS>                                     │
+       │      x-signature: <EIP191_OR_EIP712_SIG>                                      │
        │      x-timestamp: <UNIX_TIMESTAMP>                                            │
-       │                                                                               │ (5. Verify Ed25519)
+       │      x-chain: base                                                            │
+       │                                                                               │ (5. Verify EIP-191/EIP-712)
        │                                                                               │ (6. KV INCR/Check)
        │<─── (7. 200 OK / 402 Payment Required) ────────────────────────────────────────│
 ```
@@ -61,15 +62,16 @@ AI 에이전트 및 무키(Stateless) 이용자를 위한 충전 단위 및 단�
 
 ### 3.1 충전 API (`POST /v1/topup`)
 
-USDC 송금 후 트랜잭션 해시(`tx_hash`)와 본인의 지갑 주소(`wallet`)를 제출하여 크레딧을 충전합니다.
+Base USDC 송금 후 트랜잭션 해시(`tx_hash`)와 본인의 지갑 주소(`wallet`)를 제출하여 크레딧을 충전합니다.
 
 #### **요청 (Request)**
 ```bash
 curl -X POST "https://aznp-proxy.kerberos79.workers.dev/v1/topup" \
   -H "Content-Type: application/json" \
   -d '{
-    "wallet": "7xKX...AgentSolanaPublicKey",
-    "tx_hash": "5K...SolanaTransactionHash"
+    "wallet": "0x...AgentBaseAddress",
+    "tx_hash": "0x...BaseTransactionHash",
+    "chain": "base"
   }'
 ```
 
@@ -77,7 +79,7 @@ curl -X POST "https://aznp-proxy.kerberos79.workers.dev/v1/topup" \
 ```json
 {
   "success": true,
-  "wallet": "7xKX...AgentSolanaPublicKey",
+  "wallet": "0x...AgentBaseAddress",
   "deposited_usdc": 20.0,
   "added_credits": 12000,
   "total_allowed_requests": 12000
@@ -88,19 +90,23 @@ curl -X POST "https://aznp-proxy.kerberos79.workers.dev/v1/topup" \
 
 ### 3.2 서명 인증 요청 (`GET /?url=...`)
 
-에이전트는 API 호출 시 `x402:{timestamp}` 메시지를 본인의 Solana 비밀키로 서명하여 헤더로 전달합니다.
+에이전트는 API 호출 시 `x402:base:{timestamp}` 메시지를 본인의 Base(EVM) 비밀키로 서명하여 헤더로 전달합니다.
 
 #### **요청 헤더 Specification**
-- `x-wallet-address`: Solana Public Key (Base58)
+- `x-wallet-address`: Base (EVM) 주소 (0x + 40 hex)
 - `x-timestamp`: Unix Timestamp (초 단위, 5분 이내)
-- `x-signature`: `x402:{timestamp}` 메시지에 대한 Ed25519 서명 (Base58)
+- `x-signature`: `x402:base:{timestamp}` 메시지에 대한 EIP-191 personal_sign 또는 EIP-712 typed-data 서명 (0x + 130 hex)
+- `x-chain`: `base` (주소·서명 검증에 사용할 체인 선언)
+- `x-sig-type`: `eip191` | `eip712` (생략 시 EIP-191 먼저 검증 후 EIP-712 순)
 
 #### **curl 요청 예시**
 ```bash
 curl -X GET "https://aznp-proxy.kerberos79.workers.dev/?url=https://news.ycombinator.com&render=true" \
-  -H "x-wallet-address: 7xKX...AgentSolanaPublicKey" \
+  -H "x-wallet-address: 0x...AgentBaseAddress" \
   -H "x-timestamp: 1786249000" \
-  -H "x-signature: 3mZ...Ed25519SignatureBase58"
+  -H "x-signature: 0x...Eip191Signature" \
+  -H "x-chain: base" \
+  -H "x-sig-type: eip191"
 ```
 
 ---
@@ -112,9 +118,9 @@ curl -X GET "https://aznp-proxy.kerberos79.workers.dev/?url=https://news.ycombin
 ```json
 {
   "error": "Payment Required",
-  "message": "Insufficient credits or missing Solana Wallet authentication signature.",
-  "service_wallet": "GuUdPHj3dnafbFvF2gMscCVAMCd4NvSE5ktsrbdAvT4E",
-  "network": "solana",
+  "message": "Insufficient credits or missing Base (EVM) Wallet authentication signature.",
+  "receiver_wallet": "0x...BASE_RECEIVER_WALLET",
+  "chain": "base",
   "currency": "USDC",
   "min_deposit": "$20 USDC",
   "tiers": {
@@ -127,39 +133,45 @@ curl -X GET "https://aznp-proxy.kerberos79.workers.dev/?url=https://news.ycombin
 
 ---
 
-## 4. AI 에이전트 구현 예시 (Node.js)
+## 4. AI 에이전트 구현 예시 (Node.js — viem)
 
 ```javascript
-import nacl from 'tweetnacl';
-import bs58 from 'bs58';
+import { createWalletClient, http } from 'viem';
+import { base } from 'viem/chains';
+import { privateKeyToAccount } from 'viem/accounts';
 
-const AGENT_PRIVATE_KEY_BASE58 = "YOUR_AGENT_PRIVATE_KEY_BASE58";
-const secretKey = bs58.decode(AGENT_PRIVATE_KEY_BASE58);
-// nacl keypair from secret key (64 bytes)
-const keypair = nacl.sign.keyPair.fromSecretKey(secretKey);
-const publicKeyBase58 = bs58.encode(keypair.publicKey);
+const AGENT_PRIVATE_KEY = "0xYOUR_BASE_PRIVATE_KEY"; // 0x + 32 bytes hex — .env에 안전하게 보관
+const account = privateKeyToAccount(AGENT_PRIVATE_KEY); // 0x + 40 hex 주소 도출
+
+const client = createWalletClient({
+  account,
+  chain: base,                          // Base L2 (chainId 8453)
+  transport: http('https://mainnet.base.org'),
+});
 
 async function callAZNPProxy(targetUrl) {
   const timestamp = Math.floor(Date.now() / 1000).toString();
-  const message = `x402:${timestamp}`;
-  const messageBytes = new TextEncoder().encode(message);
 
-  // 메시지 Ed25519 서명
-  const signatureBytes = nacl.sign.detached(messageBytes, keypair.secretKey);
-  const signatureBase58 = bs58.encode(signatureBytes);
+  // EIP-191 (personal_sign) over "x402:base:{timestamp}" — 체인 바인딩 메시지
+  const signatureEip191 = await client.signMessage({
+    account,
+    message: `x402:base:${timestamp}`,
+  });
 
   const res = await fetch(`https://aznp-proxy.kerberos79.workers.dev/?url=${encodeURIComponent(targetUrl)}&render=true`, {
     headers: {
-      'x-wallet-address': publicKeyBase58,
-      'x-signature': signatureBase58,
+      'x-wallet-address': account.address,  // 0x + 40 hex (lowercase)
+      'x-signature': signatureEip191,
       'x-timestamp': timestamp,
+      'x-chain': 'base',
+      'x-sig-type': 'eip191',               // 또는 'eip712'
     }
   });
 
   if (res.status === 402) {
     const errorData = await res.json();
-    console.error("잔액 부족! 충전 필요. 수신 지갑:", errorData.service_wallet);
-    // 에이전트가 20 USDC 전송 후 /v1/topup 호출
+    console.error("잔액 부족! 충전 필요. 수신 지갑:", errorData.receiver_wallet);
+    // 에이전트가 20 Base USDC 전송 후 /v1/topup 호출
   } else {
     const markdown = await res.text();
     console.log("변환 성공 Clean Markdown:", markdown.slice(0, 200));
