@@ -1,0 +1,102 @@
+﻿{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AZNP — Agentic Zero-Noise Proxy",
+    "description": "Free public-good web-to-Markdown converter for AI agents. Convert any URL to clean, token-efficient Markdown. No API key, wallet, or signup needed. Optional Solana Ed25519 header signing is identity, not billing. Paid Pro credits and the Base (EVM) chain exist for compatibility but are out of grant scope.",
+    "version": "2.1.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Convert a URL to clean Markdown (free, no auth)",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "Target http(s) URL"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["markdown", "json", "toml", "yaml", "json-ld"],
+              "default": "markdown"
+            },
+            "description": "Output format (all free)"
+          },
+          {
+            "name": "max_tokens",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000
+            },
+            "description": "Truncate to N tokens (free)"
+          },
+          {
+            "name": "images",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [0, 1],
+              "default": 1
+            },
+            "description": "0 to drop images"
+          },
+          {
+            "name": "fresh",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [0, 1],
+              "default": 0
+            },
+            "description": "1 to bypass cache"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Converted markdown document"
+          },
+          "400": {
+            "description": "missing_url / invalid_url / unsupported_format / max_tokens_too_large"
+          },
+          "404": {
+            "description": "not_found"
+          },
+          "429": {
+            "description": "rate_limited (see Retry-After)"
+          },
+          "502": {
+            "description": "fetch_failed"
+          },
+          "500": {
+            "description": "internal_error"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Service health",
+        "responses": {
+          "200": {
+            "description": "{ status, version, auth }"
+          }
+        }
+      }
+    }
+  }
+}

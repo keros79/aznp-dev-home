@@ -1,0 +1,624 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* ─── 폰트 ─── */
+  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-mono: "Fira Code", "Cascadia Code", monospace;
+
+  /* ─── 색상 팔레트 ─── */
+  --color-bg: #0a0a0f;
+  --color-bg-card: rgba(255, 255, 255, 0.04);
+  --color-bg-card-hover: rgba(255, 255, 255, 0.07);
+
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+
+  --color-purple-400: #c084fc;
+  --color-purple-500: #a855f7;
+  --color-purple-600: #9333ea;
+
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+
+  --color-slate-50: #f8fafc;
+  --color-slate-200: #e2e8f0;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  --color-border: rgba(99, 102, 241, 0.2);
+  --color-border-hover: rgba(99, 102, 241, 0.5);
+
+  /* ─── 그래디언트 ─── */
+  --gradient-brand: linear-gradient(135deg, #6366f1, #a855f7, #22d3ee);
+  --gradient-card: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.05));
+
+  /* ─── 애니메이션 ─── */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ─── 반경 ─── */
+  --radius-card: 1rem;
+  --radius-btn: 0.625rem;
+}
+
+/* ─── 전역 기본 스타일 ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /*
+   * 루트에 overflow-x(hidden/clip)를 걸지 않는다.
+   * iOS Safari에서 루트를 클리핑하면 position:sticky 요소의 히트 테스트 영역이
+   * 스크롤 오프셋 0 위치에 고정돼, 화면 상단에 붙어 보이는 헤더가 터치를 못 받는다.
+   * 가로 오버플로는 각 섹션에서 차단한다(Hero: overflow:hidden, 글로우: min(600px,100%)).
+   */
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-slate-50);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+
+/* ─── 스크롤바 ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-indigo-600);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-indigo-500);
+}
+
+/* ─── 텍스트 그래디언트 유틸 ─── */
+.text-gradient {
+  background: var(--gradient-brand);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ─── 글래스모피즘 카드 ─── */
+.glass-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background var(--duration-normal) ease,
+              border-color var(--duration-normal) ease,
+              box-shadow var(--duration-normal) ease;
+}
+.glass-card:hover {
+  background: var(--color-bg-card-hover);
+  border-color: var(--color-border-hover);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
+}
+
+/* ─── 버튼 기본 ─── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, var(--color-indigo-500), var(--color-purple-600));
+  color: white;
+  font-weight: 600;
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) ease,
+              transform var(--duration-fast) ease,
+              box-shadow var(--duration-normal) ease;
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: transparent;
+  color: var(--color-slate-200);
+  font-weight: 600;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: border-color var(--duration-normal) ease,
+              color var(--duration-normal) ease,
+              background var(--duration-normal) ease;
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+.btn-outline:hover {
+  border-color: var(--color-indigo-500);
+  color: var(--color-indigo-400);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+/* ─── 섹션 래퍼 ─── */
+.section-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── 배지 ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  /*
+   * 알약 라벨은 안에서 줄바꿈되지 않는다.
+   * 한글은 기본값(word-break: normal)에서도 음절 단위로 끊겨
+   * "초고 / 속" 처럼 갈라지므로 nowrap 을 명시한다.
+   * 넘칠 때는 칩이 아니라 바깥 .chip-row / 표 래퍼가 가로 스크롤한다.
+   */
+  white-space: nowrap;
+}
+.badge-indigo {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-indigo-400);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+.badge-purple {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--color-purple-400);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+.badge-cyan {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--color-cyan-400);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+}
+
+/* ─── 라벨 칩 줄 ─── */
+/*
+ * 카드 안의 칩(배지) 묶음. 폭이 남으면 지금처럼 한 줄에 늘어놓고,
+ * 모자라면 줄바꿈 대신 가로 스크롤한다.
+ * 좁은 화면에서 칩이 2~3줄로 쌓이면 카드 높이가 들쭉날쭉해지고
+ * "라벨 - 값" 짝이 줄 사이로 끊겨 읽기 어려워진다.
+ */
+.chip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+/*
+ * flex-wrap 은 줄(flex line)만 제어하고 칩 안쪽 텍스트 줄바꿈은 못 막는다.
+ * 칩 하나가 "Cache: / HIT" 처럼 갈라지지 않도록 자식에 nowrap 을 건다.
+ */
+.chip-row > * {
+  white-space: nowrap;
+}
+
+/*
+ * 한 덩어리로 읽혀야 하는 라벨/코드 토큰.
+ * (예: `x-rate-limit-remaining`, `15 RPM / 1,000 RPD`)
+ * 중간에서 끊지 않고, 넘치면 그 줄만 가로로 스크롤한다.
+ * 스크롤 컨테이너가 되려면 인라인 요소면 안 되므로 block/flex 아이템에만 쓴다.
+ */
+.nowrap-scroll {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* 요금제 카드 기능 목록의 부가 설명 — 모바일에선 라벨 아래 자기 줄로 내려 통째로 보이게 */
+.feature-note {
+  margin-left: 0.375rem;
+}
+
+/*
+ * 가로 스크롤 영역 스크롤바.
+ * 전역 ::-webkit-scrollbar 규칙은 width만 지정해서 가로 스크롤바에는 안 먹는다.
+ */
+.chip-row,
+.nowrap-scroll,
+.feature-note {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.4) transparent;
+}
+.chip-row::-webkit-scrollbar,
+.nowrap-scroll::-webkit-scrollbar,
+.feature-note::-webkit-scrollbar {
+  height: 3px;
+}
+.chip-row::-webkit-scrollbar-track,
+.nowrap-scroll::-webkit-scrollbar-track,
+.feature-note::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chip-row::-webkit-scrollbar-thumb,
+.nowrap-scroll::-webkit-scrollbar-thumb,
+.feature-note::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 3px;
+}
+
+/* ─── About 이메일 링크 ─── */
+.about-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  color: var(--color-indigo-400);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-decoration: none;
+  /* 주소는 한 덩어리로 읽혀야 하므로 좁은 화면에서도 쪼개지 않는다 */
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  transition: border-color var(--duration-fast) ease,
+              background var(--duration-fast) ease;
+}
+.about-email:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* ─── 기술 스택 칩 (아웃라인) ─── */
+/*
+ * 기술명만 나열하는 칩. 칩 자체는 줄바꿈되지 않고, 넘치면 다음 줄로 넘어간다.
+ * (칩이 여러 줄로 쌓이는 게 정상인 태그 목록이라 .chip-row 의 가로 스크롤은 쓰지 않는다)
+ */
+.tech-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-slate-200);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: border-color var(--duration-fast) ease,
+              color var(--duration-fast) ease;
+}
+.tech-chip:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-slate-50);
+}
+
+/* ─── 정의 행 (코드 라벨 + 설명) ─── */
+.def-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  min-width: 0;
+}
+
+/* ─── 코드 블록 ─── */
+.code-block {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--color-slate-200);
+  overflow-x: auto;
+}
+
+/* ─── 입력 필드 ─── */
+.input-field {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  color: var(--color-slate-50);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--duration-normal) ease,
+              box-shadow var(--duration-normal) ease;
+}
+.input-field::placeholder {
+  color: var(--color-slate-500);
+}
+.input-field:focus {
+  border-color: var(--color-indigo-500);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ─── 애니메이션 키프레임 ─── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes flow-down {
+  0% { transform: translateY(-4px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(4px); opacity: 0; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ─── 배경 그리드 패턴 ─── */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── 섹션 타이틀 ─── */
+.section-title {
+  font-size: clamp(1.875rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.section-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--color-slate-400);
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ─── 푸터 링크 ─── */
+.footer-link {
+  font-size: 0.9rem;
+  color: var(--color-slate-500);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+.footer-link:hover {
+  color: var(--color-slate-200);
+}
+
+/* ─── 상단 내비게이션 ─── */
+/*
+ * sticky 헤더에는 backdrop-filter를 쓰지 않는다.
+ * WebKit에서 backdrop-filter가 만드는 합성 레이어는 pointer-events:none 이어도
+ * 히트 테스트를 흡수하는 사례가 있어, 내부 버튼이 터치를 못 받는다.
+ * 페이지 배경(#0a0a0f)과 거의 같은 색이라 불투명 배경으로 바꿔도 외형 차이는 미미하다.
+ */
+.nav-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(10, 10, 15, 0.96);
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4rem;
+  /*
+   * 행이 넘치면 오른쪽 버튼 묶음이 화면 밖으로 밀려 터치 불가가 된다.
+   * 로고/버튼은 절대 줄지 않게 고정하고, 줄어드는 건 가운데 링크 묶음만.
+   */
+  flex-wrap: nowrap;
+  gap: 0.75rem;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* 데스크탑 링크 묶음 — 모바일에서 숨김 */
+.nav-desktop {
+  display: none;
+  gap: 0.25rem;
+  align-items: center;
+  min-width: 0;
+}
+
+/* 햄버거 버튼 — 최소 44×44px 터치 영역 (Apple HIG 권장) */
+.nav-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  color: var(--color-slate-400);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  /*
+   * touch-action / -webkit-tap-highlight-color 를 지정하지 않는다.
+   * viewport meta 에 width=device-width 가 있으면 최신 Chrome/Safari 에는
+   * 300ms 탭 딜레이가 없어 manipulation 이 불필요하고,
+   * 기본 탭 하이라이트는 탭이 실제로 먹었는지 보여주는 피드백이라 남겨둔다.
+   */
+}
+
+.nav-mobile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-top: 1px solid var(--color-border);
+  padding: 1rem;
+}
+
+.nav-mobile-link {
+  display: block;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+@media (min-width: 640px) {
+  .nav-desktop {
+    display: flex;
+  }
+  .nav-toggle,
+  .nav-mobile-menu {
+    display: none;
+  }
+}
+
+/* ─── 문서 산문 스타일 ─── */
+.docs-prose h1, .docs-prose h2, .docs-prose h3 {
+  color: var(--color-slate-50);
+}
+.docs-prose p {
+  color: var(--color-slate-400);
+  line-height: 1.75;
+}
+
+/* ─── 문서 사이드바 링크 ─── */
+.docs-nav-link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background var(--duration-fast) ease;
+}
+.docs-nav-link:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* ─── 모바일 전용 반응형 (≤ 640px) ─── */
+/* 데스크탑(641px+) 및 태블릿에는 영향 없음 */
+@media (max-width: 640px) {
+  /* 섹션 좌우 패딩 축소 */
+  .section-wrapper {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Hero 섹션 패딩 축소 */
+  .hero-section {
+    padding-top: 4rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+
+  /* 글래스 카드 내부 패딩 축소 */
+  .glass-card-mobile-sm {
+    padding: 1.25rem !important;
+  }
+
+  /* BotDemo 카드 패딩 축소 */
+  .demo-card-mobile {
+    padding: 1.25rem !important;
+  }
+
+  /*
+   * 칩 줄 — 좌우 폭이 모자라면 줄바꿈 대신 가로 스크롤.
+   * (인라인 style 의 flexWrap 은 미디어 쿼리를 이기므로 JSX 쪽에서 빼둔다)
+   */
+  .chip-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.375rem; /* 스크롤바 자리 */
+  }
+  .chip-row > * {
+    flex: 0 0 auto;
+  }
+
+  /* 정의 행 — 코드 라벨과 설명을 위아래로 쌓아 설명이 쓸 폭을 확보 */
+  .def-row {
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.75rem 0.875rem;
+  }
+
+  /* 요금제 기능의 부가 설명 — 라벨 아래 자기 줄로 내려서 통째로 보여준다 */
+  .feature-note {
+    display: block;
+    margin-left: 0;
+    margin-top: 0.125rem;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  /* 통계 수치 크기 축소 */
+  .stat-value-mobile {
+    font-size: 1.5rem !important;
+  }
+}
