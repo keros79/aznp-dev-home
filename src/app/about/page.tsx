@@ -33,7 +33,7 @@ export default function AboutPage() {
         "TypeScript",
         "Cloudflare Workers",
         "Cloudflare KV",
-        "Solana Ed25519",
+        "Base (EVM) · EIP-191 / EIP-712",
         "Cloudflare Pages",
         "Wrangler",
       ],

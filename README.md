@@ -2,7 +2,7 @@
 
 > AI 에이전트를 위한 **Zero-Noise Markdown 프록시** — 공개 무료(public good).
 > 웹페이지를 초경량 Clean Markdown으로 변환해 LLM 토큰 비용을 75~90% 절감합니다.
-> 지갑·API Key 없이 누구나 호출할 수 있으며, Solana Ed25519 서명은 **신원(identity)** 용도로 선택 사용합니다.
+> 지갑·API Key 없이 누구나 호출할 수 있으며, Base(EVM) EIP-191 / EIP-712 서명은 **신원(identity)** 용도로 선택 사용합니다.
 
 AZNP(Agentic Zero-Noise Proxy) 공식 랜딩페이지 및 문서 사이트입니다.
 Next.js 15 App Router + Tailwind CSS v4 + Zustand + TanStack Query로 구축되었습니다.
@@ -22,7 +22,7 @@ Next.js 15 App Router + Tailwind CSS v4 + Zustand + TanStack Query로 구축되�
 - **무료 convert**: `GET /?url=...` — 로그인·API Key·크레딧 없이 바로 200. `markdown` / `json` / `toml` / `yaml` / `json-ld` 전 포맷 지원
 - **`max_tokens`**: 출력을 토큰 예산 안에서 절단 (무료)
 - **75~90% 토큰 절감**: 지저분한 HTML(광고, 네비게이션, CSS/JS 등)을 제거해 LLM 비용 절감
-- **Solana Ed25519 무상태 인증 (선택)**: 본인 지갑 키페어가 곧 계정 ID. 가입·API Key 불필요 (요청 신원용)
+- **Base(EVM) EIP-191 / EIP-712 무상태 인증 (선택)**: 본인 Base(EVM) 지갑이 곧 계정 ID. 가입·API Key 불필요 (요청 신원용)
 - **AI 표준 규격 노출**: `/llms.txt` · `/llms-full.txt` · `/openapi.json` — 인증 없이 200
 - **3-Tier Cascading Engine**: Tier 1 (Cloudflare Native) → Tier 2 (자체 변환) → Tier 3 (Browser Rendering `render=true`)
 - **다층 에지 캐시**: Cache API (L1) + Cloudflare KV (L2) 이중 캐싱
@@ -54,15 +54,16 @@ curl "https://aznp-proxy.kerberos79.workers.dev/?url=https://example.com&max_tok
 | `render` | `false` | `true` → JS 렌더링 강제 (Pro) |
 | `fresh` | `0` | `1` → 캐시 우회 |
 
-### Solana Ed25519 서명 (선택 — 신원)
+### Base(EVM) EIP-191 / EIP-712 서명 (선택 — 신원)
 
-지갑 키페어로 `x402:{timestamp}` 메시지를 Ed25519 서명해 헤더로 보내면 요청 신원을 확인하고 상위 Rate Limit을 적용합니다.
+Base(EVM) 지갑으로 `x402:base:{timestamp}` 메시지를 EIP-191 personal_sign 또는 EIP-712 typed-data로 서명해 헤더로 보내면 요청 신원을 확인하고 상위 Rate Limit을 적용합니다.
 
 ```bash
 curl "https://aznp-proxy.kerberos79.workers.dev/?url=https://news.ycombinator.com" \
-  -H "x-wallet-address: 7xKX..." \
+  -H "x-wallet-address: 0x..." \
   -H "x-timestamp: 1786249000" \
-  -H "x-signature: 3mZ..."
+  -H "x-signature: 0x..." \
+  -H "x-chain: base"
 ```
 
 ---
@@ -79,7 +80,7 @@ PDF·이미지·영상 등 HTML이 아닌 파일 URL은 **변환 없이 원본 �
 
 ## 🤖 AI 에이전트 전용 표준 규격 (Machine-Readable Specs)
 
-- **[`/llms.txt`](https://aznp-home.pages.dev/llms.txt)**: AI 에이전트 탐색용 요약 가이드 (무료 convert, Solana 서명)
+- **[`/llms.txt`](https://aznp-home.pages.dev/llms.txt)**: AI 에이전트 탐색용 요약 가이드 (무료 convert, Base(EVM) 서명)
 - **[`/llms-full.txt`](https://aznp-home.pages.dev/llms-full.txt)**: 전체 API 파라미터·헤더·에러 코드·예시
 - **[`/openapi.json`](https://aznp-home.pages.dev/openapi.json)**: OpenAPI 3.0.3 명세 (Custom GPT / LangChain 연동용)
 

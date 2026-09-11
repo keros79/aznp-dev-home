@@ -11,10 +11,11 @@ Convert any URL to clean, token-efficient Markdown for AI agents and LLMs.
 - GET /openapi.json  — OpenAPI 3.0.3 specification
 - GET /llms-full.txt — full API reference (params, headers, error codes, examples)
 
-Optional Solana Ed25519 request signing (identity, not billing):
-  x-wallet-address: <Base58 Ed25519 public key>
+Optional Base (EVM) wallet request signing (identity, not billing):
+  x-wallet-address: <0x + 40 hex address>
   x-timestamp:      <unix seconds>
-  x-signature:      <Base58 Ed25519 signature over "x402:{timestamp}">
+  x-signature:      <EIP-191 signature over "x402:base:{timestamp}">
+  x-chain:          base
 
 Planned: @aznp/mcp-server (stdio + remote MCP endpoint) wrapping this Worker.
 Paid Pro credits (POST /v1/topup with USDC) lift the rate limit.

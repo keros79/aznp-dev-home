@@ -11,7 +11,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   const docLinks = [
     { href: "/docs", label: t.intro, desc: lang === "en" ? "Overview & Quickstart" : "AZNP 개요 및 빠른 시작" },
     { href: "/docs/api", label: t.apiRef, desc: lang === "en" ? "Endpoints, Auth & Parameters" : "엔드포인트, 서명 헤더, 명세" },
-    { href: "/pricing", label: t.pricing, desc: lang === "en" ? "Solana USDC Pricing & Topup" : "Solana 소액 충전 요금" },
+    { href: "/pricing", label: t.pricing, desc: lang === "en" ? "Base USDC Pricing & Topup" : "Base 소액 충전 요금" },
   ];
 
   return (

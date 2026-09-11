@@ -54,13 +54,13 @@ export default function DocsPage() {
         </div>
       </section>
 
-      {/* Solana 충전 및 서명 인증 */}
+      {/* Base 충전 및 서명 인증 */}
       <section style={{ marginBottom: "2.5rem" }}>
         <h2 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "1rem", color: "var(--color-slate-50)" }}>
-          {t.solanaTitle}
+          {t.baseTitle}
         </h2>
         <p style={{ fontSize: "0.9375rem", color: "var(--color-slate-400)", marginBottom: "1rem", lineHeight: 1.7 }}>
-          {t.solanaSub}
+          {t.baseSub}
         </p>
         <div className="glass-card" style={{ padding: "1.5rem" }}>
           <ol style={{ paddingLeft: "1.25rem", margin: 0, color: "var(--color-slate-300)", fontSize: "0.9rem", lineHeight: 1.8 }}>

@@ -44,15 +44,17 @@ All formats and max_tokens are FREE for anonymous requests.
 | 502    | fetch_failed            | check URL reachability and retry            |
 | 500    | internal_error          | retry a limited number of times             |
 
-## Solana Ed25519 signature (optional, identity not billing)
+## Base (EVM) signature (optional, identity not billing)
 
-Sign the message "x402:{timestamp}" (timestamp = unix seconds) with your Solana
-keypair and send the headers below. Signed requests get rate-limit uplift.
+Sign the message "x402:base:{timestamp}" (timestamp = unix seconds) with your Base (EVM)
+wallet (EIP-191 personal_sign or EIP-712 typed data) and send the headers below.
+Signed requests get rate-limit uplift.
 
 ```
-x-wallet-address: <Base58 public key>
+x-wallet-address: <0x + 40 hex address>
 x-timestamp:      <unix seconds>
-x-signature:      <Base58 Ed25519 detached signature>
+x-signature:      <EIP-191 signature over "x402:base:{timestamp}">
+x-chain:          base
 ```
 
 ## Examples

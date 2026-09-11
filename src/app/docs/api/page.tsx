@@ -19,11 +19,11 @@ export default function ApiReferencePage() {
   ];
 
   const authHeaders = [
-    { name: "x-wallet-address", required: false, desc: lang === "en" ? "Solana Public Key (Base58) or Base (EVM) address (0x + 40 hex) — optional identity" : "Solana Public Key (Base58) 또는 Base (EVM) 주소 (0x + 40 hex) — 선택 신원" },
+    { name: "x-wallet-address", required: false, desc: lang === "en" ? "Base (EVM) address (0x + 40 hex) — optional identity" : "Base (EVM) 주소 (0x + 40 hex) — 선택 신원" },
     { name: "x-timestamp", required: false, desc: lang === "en" ? "Unix Timestamp (Seconds, within 5 mins) — optional identity (chain-agnostic)" : "Unix Timestamp (초 단위, 현재 시간 5분 이내) — 선택 신원 (체인 공통)" },
-    { name: "x-signature", required: false, desc: lang === "en" ? "Solana: Ed25519 signature of 'x402:{timestamp}' (Base58). Base: EIP-191 personal_sign of 'x402:base:{timestamp}' or EIP-712 typed data (0x + 130 hex) — optional identity" : "Solana: x402:{timestamp} 메시지의 Ed25519 서명 (Base58). Base: x402:base:{timestamp} EIP-191 personal_sign 또는 EIP-712 typed-data 서명 (0x + 130 hex) — 선택 신원" },
-    { name: "x-chain", required: false, desc: lang === "en" ? "'solana' (default) | 'base' — declares the chain for address & signature verification" : "'solana' (기본) | 'base' — 주소·서명 검증에 사용할 체인 선언" },
-    { name: "x-sig-type", required: false, desc: lang === "en" ? "'ed25519' (Solana default) | 'eip191' | 'eip712' (Base). On Base, when omitted, EIP-191 is verified first, then EIP-712" : "'ed25519' (Solana 기본) | 'eip191' | 'eip712' (Base). Base에서 생략 시 EIP-191 먼저 검증 후 EIP-712 순" },
+    { name: "x-signature", required: false, desc: lang === "en" ? "EIP-191 personal_sign of 'x402:base:{timestamp}' or EIP-712 typed data (0x + 130 hex) — optional identity" : "x402:base:{timestamp} 메시지의 EIP-191 personal_sign 또는 EIP-712 typed-data 서명 (0x + 130 hex) — 선택 신원" },
+    { name: "x-chain", required: false, desc: lang === "en" ? "'base' — declares the chain for address & signature verification" : "'base' — 주소·서명 검증에 사용할 체인 선언" },
+    { name: "x-sig-type", required: false, desc: lang === "en" ? "'eip191' | 'eip712'. When omitted, EIP-191 is verified first, then EIP-712" : "'eip191' | 'eip712'. 생략 시 EIP-191 먼저 검증 후 EIP-712 순" },
   ];
 
   const responseHeaders = [
@@ -37,89 +37,7 @@ export default function ApiReferencePage() {
     { name: "PAYMENT-REQUIRED", desc: lang === "en" ? "Top-up spec JSON returned on HTTP 402" : "HTTP 402 반환 시 충전 정보 JSON (수신 지갑 주소, 충전 단가)" },
   ];
 
-  const formattedCodeExample = `import nacl from 'tweetnacl';
-import bs58 from 'bs58';
-
-const AGENT_SOLANA_PRIVATE_KEY_BASE58 = "YOUR_AGENT_SOLANA_PRIVATE_KEY";
-const secretKey = bs58.decode(AGENT_SOLANA_PRIVATE_KEY_BASE58);
-const keypair = nacl.sign.keyPair.fromSecretKey(secretKey);
-const publicKeyBase58 = bs58.encode(keypair.publicKey);
-
-async function callAZNPProxy(targetUrl) {
-  const timestamp = Math.floor(Date.now() / 1000).toString();
-  const messageBytes = new TextEncoder().encode(\`x402:\${timestamp}\`);
-
-  // Generate Ed25519 detached signature
-  const signatureBytes = nacl.sign.detached(messageBytes, keypair.secretKey);
-  const signatureBase58 = bs58.encode(signatureBytes);
-
-  const endpointUrl = \`https://aznp-proxy.kerberos79.workers.dev/?url=\${encodeURIComponent(targetUrl)}&render=true\`;
-
-  const response = await fetch(endpointUrl, {
-    method: 'GET',
-    headers: {
-      'x-wallet-address': publicKeyBase58,
-      'x-timestamp': timestamp,
-      'x-signature': signatureBase58,
-    },
-  });
-
-  if (response.status === 402) {
-    const errorData = await response.json();
-    console.error("402 Payment Required: Insufficient credits. Please top up.", errorData);
-    return null;
-  }
-
-  const markdown = await response.text();
-  console.log("Token reduction:", response.headers.get("X-Token-Reduction"));
-  console.log("Clean Markdown output:", markdown.slice(0, 200));
-  return markdown;
-}`;
-
-  const walletAndAutoTopupExample = `// 1. Programmatic Solana Keypair Generation (Node.js)
-import { Keypair } from '@solana/web3.js';
-import bs58 from 'bs58';
-
-// Create a new keypair programmatically for AI Agent
-const agentKeypair = Keypair.generate();
-const secretKeyBase58 = bs58.encode(agentKeypair.secretKey);
-const publicKeyBase58 = agentKeypair.publicKey.toBase58();
-
-console.log("Agent Public Key:", publicKeyBase58);
-console.log("Agent Secret Key (Store securely in .env):", secretKeyBase58);
-
-// 2. HTTP 402 Auto-Payment Handler Pattern
-async function fetchWithAutoTopup(targetUrl) {
-  let res = await callAZNPProxy(targetUrl);
-  
-  // Detect 402 Payment Required (Insufficient credits)
-  if (res && res.status === 402) {
-    const paymentInfo = await res.json();
-    console.warn("HTTP 402 Payment Required received. Executing automated USDC topup...");
-    
-    // Step 2a: Send $20 USDC via Solana SDK to recipient wallet
-    const txHash = await executeUsdcTransfer({
-      fromKeypair: agentKeypair,
-      toAddress: paymentInfo.receiver_wallet || "RECEIVER_SOLANA_WALLET",
-      amountUsdc: 20.0
-    });
-    
-    // Step 2b: Submit transaction hash to AZNP credit topup endpoint
-    const topupRes = await fetch("https://aznp-proxy.kerberos79.workers.dev/v1/topup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ wallet: publicKeyBase58, tx_hash: txHash })
-    });
-    
-    if (topupRes.ok) {
-      console.log("Auto-topup successful! Resuming original request...");
-      return await callAZNPProxy(targetUrl); // Retry request
-    }
-  }
-  return res;
-}`;
-
-  const baseCodeExample = `// Base (EVM) EIP-191 / EIP-712 Signature & Call Example (Node.js — viem)
+  const formattedCodeExample = `// Base (EVM) EIP-191 / EIP-712 Signature & Call Example (Node.js — viem)
 import { createWalletClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
@@ -133,7 +51,7 @@ const client = createWalletClient({
   transport: http('https://mainnet.base.org'),
 });
 
-async function callAZNPProxyBase(targetUrl) {
+async function callAZNPProxy(targetUrl) {
   const timestamp = Math.floor(Date.now() / 1000).toString();
 
   // EIP-191 (personal_sign) over "x402:base:{timestamp}" — chain-bound message
@@ -156,25 +74,70 @@ async function callAZNPProxyBase(targetUrl) {
     message: { message: 'x402', timestamp: BigInt(timestamp) },
   });
 
-  const endpointUrl = \`https://aznp-proxy.kerberos79.workers.dev/?url=\${encodeURIComponent(targetUrl)}\`;
+  const endpointUrl = \`https://aznp-proxy.kerberos79.workers.dev/?url=\${encodeURIComponent(targetUrl)}&render=true\`;
+
   const response = await fetch(endpointUrl, {
     method: 'GET',
     headers: {
-      'x-wallet-address': account.address, // 0x + 40 hex (lowercase)
+      'x-wallet-address': account.address,  // 0x + 40 hex (lowercase)
       'x-timestamp': timestamp,
-      'x-signature': signatureEip191,      // use signatureEip712 when 'x-sig-type: eip712'
+      'x-signature': signatureEip191,       // use signatureEip712 when 'x-sig-type: eip712'
       'x-chain': 'base',
-      'x-sig-type': 'eip191',              // or 'eip712'
+      'x-sig-type': 'eip191',               // or 'eip712'
     },
   });
 
   if (response.status === 402) {
-    const paymentInfo = await response.json();
-    console.error('402 Payment Required:', paymentInfo.networks); // includes Base receiver wallet
+    const errorData = await response.json();
+    console.error("402 Payment Required: Insufficient credits. Please top up.", errorData);
     return null;
   }
 
-  return await response.text();
+  const markdown = await response.text();
+  console.log("Token reduction:", response.headers.get("X-Token-Reduction"));
+  console.log("Clean Markdown output:", markdown.slice(0, 200));
+  return markdown;
+}`;
+
+  const walletAndAutoTopupExample = `// 1. Base (EVM) Wallet Generation (Node.js — viem)
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
+
+// Create a new private key programmatically for an AI Agent
+const agentPrivateKey = generatePrivateKey();              // 0x + 32 bytes hex
+const agentAddress = privateKeyToAccount(agentPrivateKey);  // 0x + 40 hex
+
+console.log("Agent Address:", agentAddress);
+console.log("Agent Private Key (Store securely in .env):", agentPrivateKey);
+
+// 2. HTTP 402 Auto-Payment Handler Pattern
+async function fetchWithAutoTopup(targetUrl) {
+  let res = await callAZNPProxy(targetUrl);
+
+  // Detect 402 Payment Required (Insufficient credits)
+  if (res && res.status === 402) {
+    const paymentInfo = await res.json();
+    console.warn("HTTP 402 Payment Required received. Executing automated USDC topup...");
+
+    // Step 2a: Send $20 USDC via Base SDK to receiver wallet
+    const txHash = await executeUsdcTransfer({
+      from: agentAddress,
+      toAddress: paymentInfo.receiver_wallet || "0x...BASE_RECEIVER_WALLET",
+      amountUsdc: 20.0
+    });
+
+    // Step 2b: Submit transaction hash to AZNP credit topup endpoint
+    const topupRes = await fetch("https://aznp-proxy.kerberos79.workers.dev/v1/topup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet: agentAddress, tx_hash: txHash, chain: "base" })
+    });
+
+    if (topupRes.ok) {
+      console.log("Auto-topup successful! Resuming original request...");
+      return await callAZNPProxy(targetUrl); // Retry request
+    }
+  }
+  return res;
 }`;
 
   return (
@@ -205,7 +168,7 @@ async function callAZNPProxyBase(targetUrl) {
         </div>
       </section>
 
-      {/* Solana 서명 인증 헤더 */}
+      {/* 지갑 서명 인증 헤더 */}
       <section style={{ marginBottom: "2.5rem" }}>
         <h2 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "1rem", color: "var(--color-slate-50)" }}>
           {t.authHeaderTitle}
@@ -316,23 +279,13 @@ async function callAZNPProxyBase(targetUrl) {
         </div>
       </section>
 
-      {/* 코드 예시 */}
+      {/* 지갑 서명 코드 예시 */}
       <section style={{ marginBottom: "2.5rem" }}>
         <h2 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "1.25rem", color: "var(--color-slate-50)" }}>
           {t.codeExamplesTitle}
         </h2>
         <div className="code-block" style={{ whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)", fontSize: "0.85rem", lineHeight: 1.7 }}>
           {formattedCodeExample}
-        </div>
-      </section>
-
-      {/* Base (EVM) 서명 예시 */}
-      <section style={{ marginBottom: "2.5rem" }}>
-        <h2 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "1.25rem", color: "var(--color-slate-50)" }}>
-          {t.baseCodeTitle}
-        </h2>
-        <div className="code-block" style={{ whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)", fontSize: "0.85rem", lineHeight: 1.7 }}>
-          {baseCodeExample}
         </div>
       </section>
 
