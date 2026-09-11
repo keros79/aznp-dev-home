@@ -10,7 +10,6 @@
 - **convert는 공개 무료**: `format`(markdown/json/toml/yaml/json-ld) · `max_tokens`는 지갑·크레딧 없이 사용 가능.
 - 워커의 발견 엔드포인트(`/llms.txt` · `/llms-full.txt` · `/openapi.json`) 및 `README`와 **모순이 없도록** 정합.
 - 유료(topup/크레딧/402)는 코드·문서를 **삭제하지 않고** "Out of grant scope"로만 표기.
-- 배포(`npm run deploy` / `main` 푸시 → Pages)는 **사용자 승인 후에만** 수행.
 
 ## 현재 상태 (aznp-home `main` 기준, 2026-09-10)
 
@@ -85,7 +84,6 @@
 - [x] 홈 Hero curl이 인증 없는 convert. `/docs/api`에서 `format=json` · `max_tokens` = Free
 - [x] `public/llms.txt`에 "No API key, wallet, or signup needed to convert" (또는 동등). Worker `/llms.txt`와 모순 없음
 - [ ] 브라우저: `/` `/docs` `/docs/api` `/pricing` — 데스크톱 + 모바일. 요금 페이지가 그랜트 앞면과 모순되지 않음 (로컬에서 `npm run dev` 후 확인 요망)
-- [ ] 배포는 사용자 승인 후 (`npm run deploy` 또는 `main` 푸시 → Pages)
 
 ---
 

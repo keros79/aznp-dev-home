@@ -143,7 +143,7 @@ export default function Hero() {
             <span style={{ color: "var(--color-slate-500)" }}>{t.terminalCommentMaxTokens}</span>{"\n"}
             <span style={{ color: "var(--color-cyan-400)" }}>curl</span> <span style={{ color: "var(--color-indigo-400)" }}>&quot;https://aznp-proxy.kerberos79.workers.dev/?url=https://example.com&amp;max_tokens=2000&quot;</span>{"\n\n"}
             <span style={{ color: "var(--color-slate-500)" }}>{t.terminalCommentIdentity}</span>{"\n"}
-<span style={{ color: "var(--color-cyan-400)" }}>curl</span> -H <span style={{ color: "var(--color-indigo-400)" }}>&quot;x-wallet-address: 7xKX...SolanaPublicKey&quot;</span> -H <span style={{ color: "var(--color-indigo-400)" }}>&quot;x-signature: 5K...Ed25519Signature&quot;</span>{"\n  "}
+<span style={{ color: "var(--color-cyan-400)" }}>curl</span> -H <span style={{ color: "var(--color-indigo-400)" }}>&quot;x-wallet-address: 0x...BaseEVMAddress&quot;</span> -H <span style={{ color: "var(--color-indigo-400)" }}>&quot;x-signature: 0x...Eip191Signature&quot;</span> -H <span style={{ color: "var(--color-indigo-400)" }}>&quot;x-chain: base&quot;</span>{"\n  "}
             <span style={{ color: "var(--color-purple-400)" }}>&quot;https://aznp-proxy.kerberos79.workers.dev/?url=https://example.com&quot;</span>
           </pre>
         </div>

@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     template: "%s | AZNP",
   },
   description:
-    "Free public web-to-Markdown converter for AI agents. Convert any URL to clean Markdown — no API key, wallet, or signup. Optional Solana Ed25519 signing is identity, not billing.",
+    "Free public web-to-Markdown converter for AI agents. Convert any URL to clean Markdown — no API key, wallet, or signup. Optional Base (EVM) EIP-191 / EIP-712 signing is identity, not billing.",
   keywords: [
     "AZNP",
     "Agentic Zero-Noise Proxy",
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     "Cloudflare Workers",
     "LLM",
     "AI agent",
-    "Solana",
-    "Solana identity",
-    "Ed25519",
+    "Base (EVM)",
+    "Base EVM identity",
+    "EIP-191 / EIP-712 wallet signature",
   ],
   openGraph: {
     type: "website",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     siteName: "AZNP",
     title: "AZNP – Agentic Zero-Noise Proxy",
     description:
-      "Free public web-to-Markdown converter for AI agents. No API key or wallet needed. Optional Solana Ed25519 signing is identity, not billing.",
+      "Free public web-to-Markdown converter for AI agents. No API key or wallet needed. Optional Base (EVM) EIP-191 / EIP-712 signing is identity, not billing.",
     images: [
       {
         url: "/og-image.png",

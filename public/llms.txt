@@ -17,5 +17,4 @@ Optional Solana Ed25519 request signing (identity, not billing):
   x-signature:      <Base58 Ed25519 signature over "x402:{timestamp}">
 
 Planned: @aznp/mcp-server (stdio + remote MCP endpoint) wrapping this Worker.
-Paid Pro credits (POST /v1/topup with USDC) and the Base (EVM) chain are kept
-for compatibility but are NOT part of the grant product.
+Paid Pro credits (POST /v1/topup with USDC) lift the rate limit.

@@ -10,7 +10,7 @@ AZNP converts any URL to clean, token-efficient Markdown for AI agents.
 - GET /llms-full.txt   This full reference
 - GET /openapi.json    OpenAPI 3.0.3 spec of GET / and GET /health
 - GET /robots.txt      Crawler allow rules
-- POST /v1/topup       (out of grant scope) USDC credit top-up, kept for compatibility
+- POST /v1/topup       USDC credit top-up (paid credits)
 
 ## Query parameters (GET /)
 

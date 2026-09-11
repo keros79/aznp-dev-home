@@ -18,7 +18,6 @@ export default function PricingPreview() {
       bg: "rgba(100,116,139,0.06)",
       border: "rgba(100,116,139,0.2)",
       featured: false,
-      outOfScope: false,
       features: [
         "Tier 1 Cloudflare Native ✅",
         "Tier 2 Self Conversion ✅",
@@ -39,12 +38,11 @@ export default function PricingPreview() {
       bg: "rgba(99,102,241,0.08)",
       border: "rgba(99,102,241,0.4)",
       featured: true,
-      outOfScope: true,
       features: [
         "Tier 1 + 2 + 3 (JS Rendering) ✅",
         "Advanced Extraction (+15~30% Savings)",
         "OpenAPI / Swagger 90% Compression ✅",
-        "Solana Ed25519 Stateless Auth",
+        "Base (EVM) EIP-191 Stateless Auth",
         "POST /v1/topup Instant Deposit",
       ],
       cta: { label: t.ctaTopup, href: "/pricing" },
@@ -58,7 +56,6 @@ export default function PricingPreview() {
       bg: "rgba(168,85,247,0.06)",
       border: "rgba(168,85,247,0.25)",
       featured: false,
-      outOfScope: true,
       features: [
         "All Pro Agent Features (JS Rendering, OpenAPI/Swagger 90% Compression) ✅",
         "Scale Agent Workloads",
@@ -133,23 +130,6 @@ export default function PricingPreview() {
                 <div className="nowrap-scroll" style={{ fontSize: "0.75rem", color: "var(--color-slate-400)", marginBottom: "0.75rem" }}>
                   {plan.badge}
                 </div>
-                {plan.outOfScope && (
-                  <div
-                    style={{
-                      marginBottom: "0.75rem",
-                      fontSize: "0.7rem",
-                      fontWeight: 600,
-                      letterSpacing: "0.02em",
-                      color: "var(--color-slate-500)",
-                      border: "1px dashed rgba(100,116,139,0.3)",
-                      borderRadius: "0.5rem",
-                      padding: "0.4rem 0.625rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    {t.outOfScope}
-                  </div>
-                )}
                 <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
                   <span style={{ fontSize: "2.25rem", fontWeight: 800, color: "var(--color-slate-50)", letterSpacing: "-0.04em" }}>
                     {plan.price}
@@ -166,24 +146,6 @@ export default function PricingPreview() {
                   </li>
                 ))}
               </ul>
-
-              {plan.outOfScope && (
-                <div
-                  style={{
-                    marginBottom: "1.5rem",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    letterSpacing: "0.02em",
-                    color: "var(--color-slate-500)",
-                    border: "1px dashed rgba(100,116,139,0.3)",
-                    borderRadius: "0.5rem",
-                    padding: "0.5rem 0.75rem",
-                    textAlign: "center",
-                  }}
-                >
-                  {t.outOfScope}
-                </div>
-              )}
 
               <Link
                 href={plan.cta.href}
@@ -207,7 +169,7 @@ export default function PricingPreview() {
               fontWeight: 500,
             }}
           >
-            {lang === "en" ? "View Solana receiver wallet & POST /v1/topup guide →" : "Solana 수신 지갑 주소 및 POST /v1/topup 연동 가이드 보기 →"}
+            {lang === "en" ? "View Base (EVM) receiver wallet & POST /v1/topup guide →" : "Base(EVM) 수신 지갑 주소 및 POST /v1/topup 연동 가이드 보기 →"}
           </Link>
         </div>
       </div>

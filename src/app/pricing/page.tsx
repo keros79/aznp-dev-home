@@ -21,9 +21,9 @@ export default function PricingPage() {
       features: [
         { label: "Tier 1 Cloudflare Native", yes: true },
         { label: "Tier 2 Self Conversion", yes: true },
-        { label: "Tier 3 JS Rendering", yes: false, note: lang === "en" ? "Pro (out of grant scope)" : "Pro 전용 (그랜트 범위 밖)" },
-        { label: "Advanced Extraction (+15~30%)", yes: false, note: lang === "en" ? "Pro (out of grant scope)" : "Pro 전용 (그랜트 범위 밖)" },
-        { label: "Summary mode (mode=summary)", yes: false, note: lang === "en" ? "Pro (out of grant scope)" : "Pro 전용 (그랜트 범위 밖)" },
+        { label: "Tier 3 JS Rendering", yes: false, note: lang === "en" ? "Pro" : "Pro 전용" },
+        { label: "Advanced Extraction (+15~30%)", yes: false, note: lang === "en" ? "Pro" : "Pro 전용" },
+        { label: "Summary mode (mode=summary)", yes: false, note: lang === "en" ? "Pro" : "Pro 전용" },
         { label: "max_tokens (token budget)", yes: true, note: lang === "en" ? "Free" : "무료" },
         { label: lang === "en" ? "Output formats (markdown / json / toml / yaml / json-ld)" : "출력 포맷 (markdown / json / toml / yaml / json-ld)", yes: true, note: lang === "en" ? "All Free" : "전부 무료" },
         { label: lang === "en" ? "OpenAPI / Swagger Spec Compression" : "OpenAPI/Swagger 스펙 압축", yes: false, note: lang === "en" ? "307 Redirect (Raw)" : "307 리다이렉트 (원본)" },
@@ -50,7 +50,7 @@ export default function PricingPage() {
         { label: lang === "en" ? "OpenAPI / Swagger Spec 90% Compression" : "OpenAPI/Swagger 스펙 90% 압축", yes: true, note: "openapi/swagger.json" },
         { label: lang === "en" ? "Per-Request Cost" : "건당 단가", yes: true, note: "$0.00166 (~2.1 KRW)" },
         { label: lang === "en" ? "Gas Fee Ratio (0.7 USDC basis)" : "수수료 비중 (0.7 USDC 기준)", yes: true, note: "3.5%" },
-        { label: "Solana Ed25519 Auth", yes: true, note: "Stateless" },
+        { label: "Base (EVM) EIP-191 Auth", yes: true, note: "Stateless" },
         { label: lang === "en" ? "Signups / API Key Management" : "회원가입 / API Key 관리", yes: true, note: lang === "en" ? "Zero-Friction" : "불필요 (지갑 계정)" },
       ],
       cta: { label: t.ctaTopup, href: "/docs/api" },
@@ -70,7 +70,7 @@ export default function PricingPage() {
         { label: lang === "en" ? "Gas Fee Ratio (0.7 USDC basis)" : "수수료 비중 (0.7 USDC 기준)", yes: true, note: "0.7% (Minimal)" },
         { label: lang === "en" ? "Saved LLM Token Value" : "아끼는 LLM 토큰 가치", yes: true, note: "~$5,600 Value" },
         { label: lang === "en" ? "Priority Processing Queue" : "우선 처리 큐", yes: true },
-        { label: "Solana Ed25519 Auth", yes: true, note: "Stateless" },
+        { label: "Base (EVM) EIP-191 Auth", yes: true, note: "Stateless" },
       ],
       cta: { label: t.ctaApi, href: "/docs/api" },
     },
@@ -95,24 +95,6 @@ export default function PricingPage() {
           <p className="section-subtitle">
             {t.subtitle}
           </p>
-        </div>
-
-        {/* 그랜드 제품 앞면 한 줄 */}
-        <div
-          style={{
-            maxWidth: "840px",
-            margin: "0 auto 3rem",
-            padding: "0.875rem 1.25rem",
-            borderRadius: "0.625rem",
-            border: "1px solid rgba(34,211,238,0.25)",
-            background: "rgba(34,211,238,0.06)",
-            color: "var(--color-cyan-300)",
-            fontSize: "0.875rem",
-            lineHeight: 1.7,
-            textAlign: "center",
-          }}
-        >
-          {t.grantBanner}
         </div>
 
         {/* 요금 카드 (3개 배치) */}
@@ -213,7 +195,7 @@ export default function PricingPage() {
               <div>
                 <span style={{ color: "var(--color-cyan-400)" }}>curl</span> -X POST <span style={{ color: "var(--color-indigo-400)" }}>&quot;https://aznp-proxy.kerberos79.workers.dev/v1/topup&quot;</span>{" \\\n  "}
                 -H <span style={{ color: "var(--color-purple-400)" }}>&quot;Content-Type: application/json&quot;</span>{" \\\n  "}
-                -d <span style={{ color: "var(--color-indigo-400)" }}>&apos;{"{"}&quot;wallet&quot;: &quot;7xKX...SolanaPublicKey&quot;, &quot;tx_hash&quot;: &quot;5K...SolanaTxHash&quot;{"}"}&apos;</span>
+                -d <span style={{ color: "var(--color-indigo-400)" }}>&apos;{"{"}&quot;wallet&quot;: &quot;0x...BaseEVMAddress&quot;, &quot;tx_hash&quot;: &quot;0x...BaseTxHash&quot;, &quot;chain&quot;: &quot;base&quot;{"}"}&apos;</span>
               </div>
             </div>
           </div>

@@ -10,18 +10,20 @@ export default function ApiReferencePage() {
 
   const queryParams = [
     { name: "url", required: true, plan: lang === "en" ? "Required" : "필수", desc: lang === "en" ? "Target web page URL (Required)" : "대상 웹페이지 URL (필수)" },
-    { name: "mode", required: false, plan: "Free / Pro", desc: lang === "en" ? "auto (default) / summary (summary mode, Pro — out of grant scope)" : "auto (기본) / summary (요약 모드, Pro — 그랜트 범위 밖)" },
+    { name: "mode", required: false, plan: "Free / Pro", desc: lang === "en" ? "auto (default) / summary (summary mode, Pro)" : "auto (기본) / summary (요약 모드, Pro)" },
     { name: "max_tokens", required: false, plan: "Free", desc: lang === "en" ? "Truncate the output to N tokens (free)" : "출력을 N 토큰 이내로 절단 (무료)" },
-    { name: "render", required: false, plan: "Pro", desc: lang === "en" ? "true → force dynamic JS rendering (Tier 3, Pro — out of grant scope)" : "true → 동적 JS 렌더링 강제 (Tier 3, Pro — 그랜트 범위 밖)" },
+    { name: "render", required: false, plan: "Pro", desc: lang === "en" ? "true → force dynamic JS rendering (Tier 3, Pro)" : "true → 동적 JS 렌더링 강제 (Tier 3, Pro)" },
     { name: "format", required: false, plan: "Free", desc: lang === "en" ? "markdown (default) | json | toml | yaml | json-ld — all free" : "markdown (기본) | json | toml | yaml | json-ld — 전부 무료" },
     { name: "fresh", required: false, plan: "Free", desc: lang === "en" ? "1 → bypass cache & force refresh" : "1 → 캐시 무시하고 강제 갱신" },
     { name: "images", required: false, plan: "Free", desc: lang === "en" ? "0 → drop images from the output" : "0 → 출력에서 이미지 제거" },
   ];
 
   const authHeaders = [
-    { name: "x-wallet-address", required: false, desc: lang === "en" ? "Solana Public Key (Base58 format) — optional identity" : "Solana Public Key (Base58 포맷) — 선택 신원" },
-    { name: "x-timestamp", required: false, desc: lang === "en" ? "Unix Timestamp (Seconds, within 5 mins) — optional identity" : "Unix Timestamp (초 단위, 현재 시간 5분 이내) — 선택 신원" },
-    { name: "x-signature", required: false, desc: lang === "en" ? "Ed25519 signature of 'x402:{timestamp}' (Base58) — optional identity" : "x402:{timestamp} 메시지에 대한 Ed25519 서명 (Base58) — 선택 신원" },
+    { name: "x-wallet-address", required: false, desc: lang === "en" ? "Solana Public Key (Base58) or Base (EVM) address (0x + 40 hex) — optional identity" : "Solana Public Key (Base58) 또는 Base (EVM) 주소 (0x + 40 hex) — 선택 신원" },
+    { name: "x-timestamp", required: false, desc: lang === "en" ? "Unix Timestamp (Seconds, within 5 mins) — optional identity (chain-agnostic)" : "Unix Timestamp (초 단위, 현재 시간 5분 이내) — 선택 신원 (체인 공통)" },
+    { name: "x-signature", required: false, desc: lang === "en" ? "Solana: Ed25519 signature of 'x402:{timestamp}' (Base58). Base: EIP-191 personal_sign of 'x402:base:{timestamp}' or EIP-712 typed data (0x + 130 hex) — optional identity" : "Solana: x402:{timestamp} 메시지의 Ed25519 서명 (Base58). Base: x402:base:{timestamp} EIP-191 personal_sign 또는 EIP-712 typed-data 서명 (0x + 130 hex) — 선택 신원" },
+    { name: "x-chain", required: false, desc: lang === "en" ? "'solana' (default) | 'base' — declares the chain for address & signature verification" : "'solana' (기본) | 'base' — 주소·서명 검증에 사용할 체인 선언" },
+    { name: "x-sig-type", required: false, desc: lang === "en" ? "'ed25519' (Solana default) | 'eip191' | 'eip712' (Base). On Base, when omitted, EIP-191 is verified first, then EIP-712" : "'ed25519' (Solana 기본) | 'eip191' | 'eip712' (Base). Base에서 생략 시 EIP-191 먼저 검증 후 EIP-712 순" },
   ];
 
   const responseHeaders = [
@@ -117,6 +119,64 @@ async function fetchWithAutoTopup(targetUrl) {
   return res;
 }`;
 
+  const baseCodeExample = `// Base (EVM) EIP-191 / EIP-712 Signature & Call Example (Node.js — viem)
+import { createWalletClient, http } from 'viem';
+import { base } from 'viem/chains';
+import { privateKeyToAccount } from 'viem/accounts';
+
+// Agent EVM private key (0x + 32 bytes hex) — store securely in .env
+const account = privateKeyToAccount('0xYOUR_BASE_PRIVATE_KEY'); // derives 0x + 40 hex address
+
+const client = createWalletClient({
+  account,
+  chain: base,                          // Base L2 (chainId 8453)
+  transport: http('https://mainnet.base.org'),
+});
+
+async function callAZNPProxyBase(targetUrl) {
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+
+  // EIP-191 (personal_sign) over "x402:base:{timestamp}" — chain-bound message
+  const signatureEip191 = await client.signMessage({
+    account,
+    message: \`x402:base:\${timestamp}\`,
+  });
+
+  // EIP-712 (typed data) — X402Auth(string message, uint256 timestamp)
+  const signatureEip712 = await client.signTypedData({
+    account,
+    domain: { name: 'AZNP', version: '1', chainId: 8453 },
+    types: {
+      X402Auth: [
+        { name: 'message', type: 'string' },
+        { name: 'timestamp', type: 'uint256' },
+      ],
+    },
+    primaryType: 'X402Auth',
+    message: { message: 'x402', timestamp: BigInt(timestamp) },
+  });
+
+  const endpointUrl = \`https://aznp-proxy.kerberos79.workers.dev/?url=\${encodeURIComponent(targetUrl)}\`;
+  const response = await fetch(endpointUrl, {
+    method: 'GET',
+    headers: {
+      'x-wallet-address': account.address, // 0x + 40 hex (lowercase)
+      'x-timestamp': timestamp,
+      'x-signature': signatureEip191,      // use signatureEip712 when 'x-sig-type: eip712'
+      'x-chain': 'base',
+      'x-sig-type': 'eip191',              // or 'eip712'
+    },
+  });
+
+  if (response.status === 402) {
+    const paymentInfo = await response.json();
+    console.error('402 Payment Required:', paymentInfo.networks); // includes Base receiver wallet
+    return null;
+  }
+
+  return await response.text();
+}`;
+
   return (
     <article>
       {/* 헤더 */}
@@ -171,9 +231,6 @@ async function fetchWithAutoTopup(targetUrl) {
           {t.topupTitle}
         </h2>
         <div className="glass-card" style={{ padding: "1.5rem", marginBottom: "1rem" }}>
-          <div style={{ fontSize: "0.8125rem", color: "var(--color-slate-400)", marginBottom: "0.75rem", border: "1px dashed rgba(100,116,139,0.3)", borderRadius: "0.5rem", padding: "0.5rem 0.75rem" }}>
-            {t.topupScope}
-          </div>
           <div style={{ fontSize: "0.875rem", color: "var(--color-slate-300)", marginBottom: "0.75rem" }}>
             {t.topupSub}
           </div>
@@ -182,13 +239,14 @@ async function fetchWithAutoTopup(targetUrl) {
             <div>
               <span style={{ color: "var(--color-cyan-400)" }}>curl</span> -X POST <span style={{ color: "var(--color-indigo-400)" }}>&quot;https://aznp-proxy.kerberos79.workers.dev/v1/topup&quot;</span>{" \\\n  "}
               -H <span style={{ color: "var(--color-purple-400)" }}>&quot;Content-Type: application/json&quot;</span>{" \\\n  "}
-              -d <span style={{ color: "var(--color-indigo-400)" }}>&apos;{"{"}&quot;wallet&quot;: &quot;7xKX...SolanaPublicKey&quot;, &quot;tx_hash&quot;: &quot;5K...SolanaTxHash&quot;{"}"}&apos;</span>
+              -d <span style={{ color: "var(--color-indigo-400)" }}>&apos;{"{"}&quot;wallet&quot;: &quot;0x...BaseEVMAddress&quot;, &quot;tx_hash&quot;: &quot;0x...BaseTxHash&quot;, &quot;chain&quot;: &quot;base&quot;{"}"}&apos;</span>
             </div>
             <div style={{ color: "var(--color-slate-500)", marginTop: "1rem", marginBottom: "0.5rem" }}># Response (200 OK)</div>
             <div>
               {`{
   "success": true,
-  "wallet": "7xKX...SolanaPublicKey",
+  "chain": "base",
+  "wallet": "0x...BaseEVMAddress",
   "deposited_usdc": 20.0,
   "added_credits": 12000,
   "total_allowed_requests": 12000
@@ -268,6 +326,16 @@ async function fetchWithAutoTopup(targetUrl) {
         </div>
       </section>
 
+      {/* Base (EVM) 서명 예시 */}
+      <section style={{ marginBottom: "2.5rem" }}>
+        <h2 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "1.25rem", color: "var(--color-slate-50)" }}>
+          {t.baseCodeTitle}
+        </h2>
+        <div className="code-block" style={{ whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)", fontSize: "0.85rem", lineHeight: 1.7 }}>
+          {baseCodeExample}
+        </div>
+      </section>
+
       {/* 지갑 생성 및 자동 결제 코드 예시 */}
       <section style={{ marginBottom: "2.5rem" }}>
         <h2 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "1.25rem", color: "var(--color-slate-50)" }}>
@@ -316,8 +384,8 @@ async function fetchWithAutoTopup(targetUrl) {
         </div>
         <div className="glass-card" style={{ padding: "1rem", marginTop: "1rem", fontSize: "0.875rem", color: "var(--color-slate-400)", lineHeight: 1.7 }}>
           {lang === "en"
-            ? "HTTP 402 is only returned by the out-of-grant-scope credit system (POST /v1/topup) when credits are exhausted. Its body and PAYMENT-REQUIRED header remain JSON."
-            : "HTTP 402는 그랜트 범위 밖의 크레딧 시스템(POST /v1/topup)에서 크레딧이 소진됐을 때만 반환됩니다. 바디와 PAYMENT-REQUIRED 헤더는 JSON 형태가 유지됩니다."}
+            ? "HTTP 402 is only returned by the credit system (POST /v1/topup) when credits are exhausted. Its body and PAYMENT-REQUIRED header remain JSON."
+            : "HTTP 402는 크레딧 시스템(POST /v1/topup)에서 크레딧이 소진됐을 때만 반환됩니다. 바디와 PAYMENT-REQUIRED 헤더는 JSON 형태가 유지됩니다."}
         </div>
       </section>
     </article>

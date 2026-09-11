@@ -14,7 +14,6 @@ Next.js 15 App Router + Tailwind CSS v4 + Zustand + TanStack Query로 구축되�
 - **Localization**: i18n (English `en` 기본, 한국어 `ko` 지원, 🌐 언어 스위처 제공)
 - **State Management**: Zustand (`i18nStore`, `demoStore`)
 - **Data Fetching**: TanStack Query v5
-- **Deployment**: Cloudflare Pages (GitHub 저장소 자동 연동 배포)
 
 ---
 
@@ -27,8 +26,6 @@ Next.js 15 App Router + Tailwind CSS v4 + Zustand + TanStack Query로 구축되�
 - **AI 표준 규격 노출**: `/llms.txt` · `/llms-full.txt` · `/openapi.json` — 인증 없이 200
 - **3-Tier Cascading Engine**: Tier 1 (Cloudflare Native) → Tier 2 (자체 변환) → Tier 3 (Browser Rendering `render=true`)
 - **다층 에지 캐시**: Cache API (L1) + Cloudflare KV (L2) 이중 캐싱
-
-> **그랜트 범위**: Base(EVM L2) 멀티체인·유료 크레딧(topup)·Browser Rendering은 **코드는 유지**하되 이번 Superteam 그랜트 제품이 아닙니다 (아래 "Out of grant scope" 참고).
 
 ---
 
@@ -53,8 +50,8 @@ curl "https://aznp-proxy.kerberos79.workers.dev/?url=https://example.com&max_tok
 | `format` | `markdown` | `markdown` / `json` / `toml` / `yaml` / `json-ld` — **전 포맷 무료** |
 | `max_tokens` | `0` | 최대 토큰 제한 (**무료**) |
 | `images` | `1` | `0` → 이미지 제외 |
-| `mode` | `auto` | `auto` / `summary` (summary는 Pro — 그랜트 범위 밖) |
-| `render` | `false` | `true` → JS 렌더링 강제 (Pro — 그랜트 범위 밖) |
+| `mode` | `auto` | `auto` / `summary` (summary는 Pro) |
+| `render` | `false` | `true` → JS 렌더링 강제 (Pro) |
 | `fresh` | `0` | `1` → 캐시 우회 |
 
 ### Solana Ed25519 서명 (선택 — 신원)
@@ -88,9 +85,7 @@ PDF·이미지·영상 등 HTML이 아닌 파일 URL은 **변환 없이 원본 �
 
 ---
 
-## 🚫 Out of grant scope (그랜트 제품 아님 — 코드는 유지)
-
-아래 기능은 **호환성·기존 사용자**를 위해 코드는 그대로 유지하지만, 이번 Superteam 마이크로그랜트($10k)의 **제품·서사에는 포함하지 않습니다**.
+## 💳 유료 크레딧 — 온체인 충전 (`POST /v1/topup`)
 
 ### 유료 크레딧 — 온체인 충전 (`POST /v1/topup`)
 
@@ -99,17 +94,17 @@ PDF·이미지·영상 등 HTML이 아닌 파일 URL은 **변환 없이 원본 �
 | **Pro Agent** | **$20 USDC** | **12,000회** | **$0.00166** |
 | **Enterprise** | **$100 USDC** | **80,000회** | **$0.00125** |
 
-- 충전 엔드포인트: `POST /v1/topup` (`{ "wallet": "...", "tx_hash": "..." }`)
-- 인증 헤더: `x-wallet-address`, `x-timestamp`, `x-signature`
-- Lemon Squeezy / 수동 Pro API Key(`X-API-Key: aznp_pro_...`)도 존장하나 그랜트 제품 아님
+- 충전 엔드포인트: `POST /v1/topup` (`{ "wallet": "...", "tx_hash": "...", "chain": "base" }`)
+- 인증 헤더: `x-wallet-address`, `x-timestamp`, `x-signature`, `x-chain`
+- Lemon Squeezy / 수동 Pro API Key(`X-API-Key: aznp_pro_...`)도 지원합니다.
 
 ### Base (EVM L2) 멀티체인
 
-Solana 외 Base 지갑(EIP-191 / EIP-712) 인증·Base native USDC 충전·`networks[]`의 base 객체는 **코드로 지원**하되, 그랜트 서술·README 앞면·`/health` 카피에서는 제외됩니다.
+Base 지갑(EIP-191 / EIP-712) 인증·Base native USDC 충전·`networks[]`의 base 객체를 지원합니다.
 
 ### Browser Rendering (Pro Tier 3)
 
-`render=true` 시 JS 렌더링 폴백 경로는 유지하되, 완전 연동·정식 기능은 **이번 그랜트 범위 밖**입니다.
+`render=true` 시 JS 렌더링 폴백 경로(Tier 3 Pro)를 제공합니다.
 
 ---
 
@@ -125,11 +120,3 @@ npm run build
 # 로컬 Cloudflare Pages 에뮬레이션
 npm run preview
 ```
-
-## ☁️ Cloudflare Pages 배포
-
-- **Build command**: `npm run build`
-- **Build output directory**: `out`
-- `main` 브랜치 푸시 시 자동 배포 됩니다. 수동 배포는 `npm run deploy`.
-
-> ⚠️ **주의사항 (Agent Rule)**: 프로덕션 배포 전에 반드시 사용자 승인을 받아야 합니다.

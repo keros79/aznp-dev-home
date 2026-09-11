@@ -1,9 +1,42 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# 프로젝트 AI 에이전트 작업 지침 (AGENTS.md)
 
-# This is NOT the Next.js you know
+이 문서는 프로젝트 내 작업을 수행하는 모든 AI 코딩 에이전트를 위한 핵심 규칙과 참조 안내서입니다.
+작업을 시작하기 전, 아래에 지정된 문서들을 순서대로 확인하고 해당 가이드라인을 엄격히 준수하세요.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+---
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+## 1. 프로젝트 핵심 문서 참조 (Mandatory Context)
 
-<!-- END:nextjs-agent-rules -->
+모든 작업은 아래 `docs/` 디렉터리의 문서 기준에 맞춰 수행해야 합니다.
+
+1. **`docs/SPEC.md`**: 기능 사양 및 프로젝트 목표
+   - 프로젝트의 비전, 핵심 요구사항, 유저 스토리 및 비기능적 요구사항이 정의되어 있습니다.
+   - 새로운 기능을 구현하거나 기존 기능을 변경할 때 목표에 부합하는지 반드시 확인하세요.
+
+2. **`docs/ARCHITECTURE.md`**: 파일/디렉터리 구조 및 클래스 설계
+   - 시스템 아키텍처, 디렉터리 레이아웃, 모듈 간 의존성, 클래스 및 데이터 모델 구조가 정의되어 있습니다.
+   - 코드 작성 시 정의된 계층(Layer)과 네이밍 컨벤션을 이탈하지 마세요.
+
+3. **`docs/TASKS.md`**: 구현할 세부 작업 체크리스트 (1단계 ~ N단계)
+   - 작업의 순서 및 마일스톤별 세부 체크리스트입니다.
+   - 작업 착수 시 현재 진행 중인 단계의 작업 항목을 확인하고, 완료 후 체크리스트 상태를 업데이트하세요.
+
+---
+
+## 2. 에이전트 행동 지침 및 작업 흐름 (Workflow Rules)
+
+### Phase 1: 작업 시작 전 (Context Awareness)
+- **문서 동기화**: 요청받은 기능이 `docs/SPEC.md`의 목표와 맞는지, `docs/TASKS.md` 상에서 어떤 단계에 위치해 있는지 파악합니다.
+- **설계 확인**: `docs/ARCHITECTURE.md`를 읽고 작성할 코드의 파일 위치, 인터페이스, 클래스 구조를 구상합니다.
+
+### Phase 2: 코드 작성 및 수정 (Implementation)
+- **일관성 유지**: 기존 파일 구조와 스타일 가이드를 준수합니다.
+- **점진적 구현**: 한 번에 과도하게 많은 파일을 변경하지 말고 `docs/TASKS.md`에 명시된 단위별로 분할하여 구현합니다.
+- **사이드 이펙트 방지**: 기존 아키텍처 규칙을 위배하는 임의의 모듈이나 외부 라이브러리를 무단으로 추가하지 마세요.
+
+### Phase 3: 검증 및 문서 업데이트 (Verification & Handover)
+- **테스트 및 검증**: 작성한 코드에 대해 빌드 및 테스트(유닛/통합 테스트)를 실행하여 동작을 확인합니다.
+- **상태 업데이트**: 작업이 완료되면 `docs/TASKS.md` 해당 항목의 체크박스를 `[x]`로 갱신합니다.
+- **변경 사항 요약**: 작업 완료 후 수정한 파일 목록과 `docs/SPEC.md` / `docs/ARCHITECTURE.md` 대비 달성한 내용을 사용자에게 명확히 보고합니다.
+
+---

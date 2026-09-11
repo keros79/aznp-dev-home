@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "preview": "next build && wrangler pages dev out",
-    "deploy": "next build && wrangler pages deploy out --project-name=aznp-home",
     "lint": "eslint"
   },
   "dependencies": {
