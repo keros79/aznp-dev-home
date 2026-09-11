@@ -121,7 +121,7 @@ async function fetchWithAutoTopup(targetUrl) {
     // Step 2a: Send $20 USDC via Base SDK to receiver wallet
     const txHash = await executeUsdcTransfer({
       from: agentAddress,
-      toAddress: paymentInfo.receiver_wallet || "0x...BASE_RECEIVER_WALLET",
+      toAddress: paymentInfo.receiver_wallet || "0x22E2076148c529981495c3C02A23DfB1D4f8Db9C",
       amountUsdc: 20.0
     });
 

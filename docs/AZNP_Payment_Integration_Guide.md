@@ -27,7 +27,7 @@ AI 에이전트 및 무키(Stateless) 이용자를 위한 충전 단위 및 단�
 | **Enterprise** | **$100 USDC** | **80,000회** | **$0.00125** (약 1.6원) | **0.7%** (수수료 극소화) | 약 $5,600 (약 730만원 상당) |
 
 - **최소 충전 요건**: **$20 USDC** ($20 미만 입금 시 충전 거부)
-- **수신 서비스 지갑 주소 (Base)**: `0x<BASE_RECEIVER_WALLET>` (실제 주소로 교체)
+- **수신 서비스 지갑 주소 (Base)**: `0x22E2076148c529981495c3C02A23DfB1D4f8Db9C`
 - **USDC (ERC-20) 컨트랙트 (Base)**: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`
 
 ---
@@ -119,7 +119,7 @@ curl -X GET "https://aznp-proxy.kerberos79.workers.dev/?url=https://news.ycombin
 {
   "error": "Payment Required",
   "message": "Insufficient credits or missing Base (EVM) Wallet authentication signature.",
-  "receiver_wallet": "0x...BASE_RECEIVER_WALLET",
+  "receiver_wallet": "0x22E2076148c529981495c3C02A23DfB1D4f8Db9C",
   "chain": "base",
   "currency": "USDC",
   "min_deposit": "$20 USDC",
